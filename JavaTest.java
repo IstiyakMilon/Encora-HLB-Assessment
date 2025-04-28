@@ -83,7 +83,55 @@ class JavaTest {
     //         3rd equation: x*1.5-6 = 8*1.5-6 = 6
     //         return 6.0
     public static double solveEquations(double input, String[] equations) {
-        return 0.0;
+        double x = input;
+        for (String equation : equations) {
+            String expr = equation.replace("x", Double.toString(x));
+            x = evaluate(expr);
+        }
+        return x;
+    }
+
+    private static double evaluate(String expr) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder num = new StringBuilder();
+        boolean expectNumber = true;  // Flag to allow leading negative numbers
+
+        for (char c : expr.toCharArray()) {
+            if ("+-*/".indexOf(c) >= 0) {
+                if (expectNumber && c == '-') {
+                    // It's a negative number
+                    num.append(c);
+                    expectNumber = false;
+                } else {
+                    if (num.length() > 0) {
+                        tokens.add(num.toString());
+                    }
+                    tokens.add(Character.toString(c));
+                    num = new StringBuilder();
+                    expectNumber = true;
+                }
+            } else {
+                num.append(c);
+                expectNumber = false;
+            }
+        }
+
+        if (num.length() > 0) {
+            tokens.add(num.toString());
+        }
+
+        double result = Double.parseDouble(tokens.get(0));
+        for (int i = 1; i < tokens.size(); i += 2) {
+            String op = tokens.get(i);
+            double next = Double.parseDouble(tokens.get(i + 1));
+            switch (op) {
+                case "+" -> result += next;
+                case "-" -> result -= next;
+                case "*" -> result *= next;
+                case "/" -> result /= next;
+            }
+        }
+        return result;
     }
 
 
